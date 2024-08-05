@@ -1,9 +1,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
-using Amazon.DynamoDBv2.Model;
 using AWS.DynamoDB.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography.Xml;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +33,15 @@ app.MapGet("/get-employees", async (
     return employees;
 });
 
+
+app.MapGet("/get-employee-by-id", async (
+    [FromServices] IDynamoDBContext _context,
+    [FromQuery] int id) =>
+{
+    var employee = await _context.LoadAsync<Employee>(id);
+
+    return Results.Ok(employee);
+});
 
 
 
