@@ -127,4 +127,28 @@ app.MapDelete("/delete-table-by-name", async (
 
 });
 
+app.MapPost("/create-employee-table", async (
+    [FromServices] IAmazonDynamoDB _amazonDynamoDb) =>
+{
+    var createTableRequest = new CreateTableRequest()
+    {
+        TableName = "employees",
+        AttributeDefinitions = new List<AttributeDefinition>()
+        {
+            new AttributeDefinition("id",ScalarAttributeType.N)
+        },
+        KeySchema = new List<KeySchemaElement>()
+        {
+            new KeySchemaElement("id",KeyType.HASH)
+        },
+        ProvisionedThroughput = new ProvisionedThroughput(5, 5),
+      
+    };
+
+    var createTableResponse = await _amazonDynamoDb.CreateTableAsync(createTableRequest);
+
+
+    return Results.Ok(createTableResponse);
+});
+
 app.Run();
