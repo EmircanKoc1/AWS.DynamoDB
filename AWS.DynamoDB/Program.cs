@@ -55,6 +55,18 @@ app.MapPost("/add-employee", async (
 });
 
 
+app.MapPut("update-employee", async (
+    [FromServices] IDynamoDBContext _context,
+    [FromBody] Employee employee) =>
+{
+    if (await _context.LoadAsync<Employee>(employee.Id) is Employee foundedEmployee)
+    {
+        await _context.SaveAsync(employee);
+        return Results.Ok();
+    }
 
+    return Results.NotFound();
+
+});
 
 app.Run();
