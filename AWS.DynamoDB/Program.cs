@@ -92,6 +92,39 @@ app.MapGet("/list-tables", async (
 
 });
 
+app.MapDelete("/delete-table-by-name", async (
+    [FromServices] IAmazonDynamoDB _amazonDynamoDb,
+    [FromQuery] string tableName) =>
+{
 
+
+    var desribeTableRequest = new DescribeTableRequest()
+    {
+        TableName = tableName
+    };
+
+    try
+    {
+        await _amazonDynamoDb.DescribeTableAsync(desribeTableRequest);
+    }
+    catch (ResourceNotFoundException ex)
+    {
+        return Results.NotFound("table not found !");
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+
+    var deletedTableRequest = new DeleteTableRequest()
+    {
+        TableName = tableName
+    };
+
+    var deleteTableResponse = await _amazonDynamoDb.DeleteTableAsync(deletedTableRequest);
+
+    return Results.Ok(deleteTableResponse);
+
+});
 
 app.Run();
