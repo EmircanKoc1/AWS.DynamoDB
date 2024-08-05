@@ -43,6 +43,16 @@ app.MapGet("/get-employee-by-id", async (
     return Results.Ok(employee);
 });
 
+app.MapPost("/add-employee", async (
+    [FromServices] IDynamoDBContext _context,
+    [FromBody] Employee employee) =>
+{
+
+    await _context.SaveAsync<Employee>(employee);
+
+    return Results.Ok();
+
+});
 
 
 
