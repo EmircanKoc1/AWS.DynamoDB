@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using Amazon.DynamoDBv2.Model;
 using AWS.DynamoDB.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -33,7 +34,6 @@ app.MapGet("/get-employees", async (
 
     return employees;
 });
-
 
 app.MapGet("/get-employee-by-id", async (
     [FromServices] IDynamoDBContext _context,
@@ -78,6 +78,20 @@ app.MapDelete("/delete-employee-by-id", async (
     await _context.DeleteAsync<Employee>(id);
     return Results.Ok("entity was deleted");
 });
+
+app.MapGet("/list-tables", async (
+    [FromServices] IAmazonDynamoDB _amazonDynamoDb,
+    [FromQuery] int limit) =>
+{
+    var tableListRequest = new ListTablesRequest()
+    {
+        Limit = limit
+    };
+
+    return Results.Ok(await _amazonDynamoDb.ListTablesAsync(tableListRequest));
+
+});
+
 
 
 app.Run();
