@@ -27,8 +27,8 @@ app.MapGet("/get-employees", async (
 {
 
     var employees = await _dynamoDbcontext
-                                             .ScanAsync<Employee>(default)
-                                             .GetRemainingAsync();
+                                           .ScanAsync<Employee>(default)
+                                           .GetRemainingAsync();
 
     return employees;
 });
@@ -55,18 +55,29 @@ app.MapPost("/add-employee", async (
 });
 
 
-app.MapPut("update-employee", async (
+app.MapPut("/update-employee-by-id", async (
     [FromServices] IDynamoDBContext _context,
     [FromBody] Employee employee) =>
 {
-    if (await _context.LoadAsync<Employee>(employee.Id) is Employee foundedEmployee)
-    {
-        await _context.SaveAsync(employee);
-        return Results.Ok();
-    }
+    if (await _context.LoadAsync<Employee>(employee.Id) is null)
+        return Results.NotFound("entity not found!");
 
-    return Results.NotFound();
+    await _context.SaveAsync(employee);
+    return Results.Ok();
 
 });
+
+
+app.MapDelete("/delete-employee-by-id", async (
+    [FromServices] IDynamoDBContext _context,
+    [FromQuery] int id) =>
+{
+    if (await _context.LoadAsync<Employee>(id) is null)
+        return Results.NotFound("entity not found");
+
+    await _context.DeleteAsync<Employee>(id);
+    return Results.Ok("entity was deleted");
+});
+
 
 app.Run();
